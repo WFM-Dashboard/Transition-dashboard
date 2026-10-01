@@ -544,7 +544,7 @@ const CATEGORY_MEANING = {
 const REQ_CATS = ['Statement of Work | MOA and Preliminaries','WFM Support','WFM Deliverables','WFM Processes Implementation Guide','Verint Tool Setup','WFM Forecasting Processes','WFM Capacity Planning Processes','WFM Scheduling Processes','WFM Intraday Management Processes','WFM Standard Reporting Package','Finance','Time-tracking / Invoicing','WFM Performance Reviews','Continuous Improvement'];
 const REQ_SHORT = {'Statement of Work | MOA and Preliminaries':'SOW','WFM Support':'Support','WFM Deliverables':'Deliv','WFM Processes Implementation Guide':'Guide','Verint Tool Setup':'Verint','WFM Forecasting Processes':'Fcst','WFM Capacity Planning Processes':'Cap','WFM Scheduling Processes':'Sched','WFM Intraday Management Processes':'Intra','WFM Standard Reporting Package':'Rpt','Finance':'Fin','Time-tracking / Invoicing':'Time','WFM Performance Reviews':'Perf','Continuous Improvement':'CI'};
 const OWNERS = ['Gerson Jiménez','Elle Kumari','Michael Vergara'];
-const DIRECTORS = DATA.directors.filter(d => d !== 'Carlos Garcia');
+const DIRECTORS = DATA.directors.filter(d => d !== 'Carlos Garcia' && d !== 'Emannuel Rarela').concat(['Marilena Grosu']).sort((a, b) => (a === 'Unassigned') - (b === 'Unassigned') || a.localeCompare(b));
 const SEV_W = {Critical:0,High:1,Medium:2,Low:3};
 const CLOSED_CUTOFF = iso(new Date(TODAY.getFullYear() - 1, 10, 1)); // Nov 1 of last year
 const NOT_RECORDED_REASON = 'Not recorded in Monday.com. Add it in the board\'s "Reason" column.';
