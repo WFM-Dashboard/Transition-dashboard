@@ -354,6 +354,9 @@ abbr.cat{text-decoration:underline dotted;text-underline-offset:3px;cursor:help;
 .hold-reason.missing{color:#ffbd6b}
 .hold-reason.missing .ic{color:#ffbd6b}
 
+.cat-cell{min-width:210px;max-width:260px}
+.cat-cell b{font-weight:700}
+
 /* ---------- Responsive ---------- */
 @media (max-width:1380px){
   .grid-main{grid-template-columns:minmax(0,1fr)}
@@ -418,7 +421,7 @@ abbr.cat{text-decoration:underline dotted;text-underline-offset:3px;cursor:help;
     </div>
     <nav class="nav" id="nav" aria-label="Main"></nav>
     <div class="side-foot">
-      <div class="me"><div class="avatar" id="meAv">GJ</div><div class="me-t"><b id="meName">Gerson Jiménez</b><span id="meRole">Admin</span></div></div>
+      <div class="me"><div class="avatar" id="meAv">MV</div><div class="me-t"><b id="meName">Michael Vergara</b><span id="meRole">Admin</span></div></div>
       <button class="collapse-btn" id="collapseBtn" type="button" aria-label="Collapse sidebar"></button>
     </div>
   </aside>
@@ -534,9 +537,9 @@ const SEVERITIES = ['Critical','High','Medium','Low'];
 const RISK_STATUSES = ['Open','Mitigating','Resolved','Closed'];
 const CATEGORIES = ['NCNB','ECNB','ECEB'];
 const CATEGORY_MEANING = {
-  NCNB:'New Customer, New Business (New Program)',
-  ECEB:'Existing Customer, Existing Business (Ramp up)',
-  ECNB:'Existing Customer, New Business (new LOB or new GEO)'
+  NCNB:'New Customer New Business (New Program)',
+  ECEB:'Existing Customer Existing Business (Ramp up)',
+  ECNB:'Existing Customer New Business (new LOB or new GEO)'
 };
 const REQ_CATS = ['Statement of Work | MOA and Preliminaries','WFM Support','WFM Deliverables','WFM Processes Implementation Guide','Verint Tool Setup','WFM Forecasting Processes','WFM Capacity Planning Processes','WFM Scheduling Processes','WFM Intraday Management Processes','WFM Standard Reporting Package','Finance','Time-tracking / Invoicing','WFM Performance Reviews','Continuous Improvement'];
 const REQ_SHORT = {'Statement of Work | MOA and Preliminaries':'SOW','WFM Support':'Support','WFM Deliverables':'Deliv','WFM Processes Implementation Guide':'Guide','Verint Tool Setup':'Verint','WFM Forecasting Processes':'Fcst','WFM Capacity Planning Processes':'Cap','WFM Scheduling Processes':'Sched','WFM Intraday Management Processes':'Intra','WFM Standard Reporting Package':'Rpt','Finance':'Fin','Time-tracking / Invoicing':'Time','WFM Performance Reviews':'Perf','Continuous Improvement':'CI'};
@@ -631,7 +634,7 @@ const DB = (function(){
   const sp = programs.find(p => p.name === 'SimpliSafe');
   if(sp) risks.push({id:'RSK-' + (++kn), programId:sp.id, issue:'Status may be out of date', description:'Monday shows a Closing Date of Jun 29, 2026, but the program is still in Active Projects.',
     impact:'Overstates the ongoing portfolio', severity:'Low', owner:sp.owner, mitigation:'Confirm the transition is closed and move it to Closed Projects', dueDate:'', status:'Open', createdDate:sp.lastUpdated});
-  const users = DATA.users.map((u, i) => ({id:'USR-' + (i + 1), name:u.name, role:u.role, kind:u.kind, email:''}));
+  const users = DATA.users.map((u, i) => ({id:'USR-' + (i + 1), name:u.name, role:(u.name === 'Michael Vergara' ? 'Admin' : 'Viewer'), kind:u.kind, email:''}));
   return {programs, tasks, reqs, risks, miles, acts, notes, users};
 })();
 
@@ -673,22 +676,22 @@ const Api = (function(){
         if(saved.status === 'Completed' && !saved.closedDate) saved.closedDate = now;
         if(saved.status !== 'Completed') saved.closedDate = '';
         DB.programs[i] = saved;
-        DB.acts.push({id:'ACT-' + Date.now(), programId:saved.id, user:'Gerson Jiménez', action:'updated program details', ts:new Date().toISOString()});
+        DB.acts.push({id:'ACT-' + Date.now(), programId:saved.id, user:'Michael Vergara', action:'updated program details', ts:new Date().toISOString()});
       } else {
         const n = Math.max.apply(null, DB.programs.map(x => parseInt(x.id.slice(4), 10))) + 1;
         saved = Object.assign({progress:0, sow:'', notes:'', mondayNote:'', mondayUrl:'', onSheet:false, holdReason:'', closedDate:'', closedBasis:'', outcome:'', sections:[], summary:''},
           p, extra, {id:'PRG-' + String(n).padStart(3, '0'), createdDate:now, lastUpdated:now, updatedAt:new Date().toISOString(),
           group: p.status === 'On Hold' ? 'hold' : (p.status === 'Completed' ? 'closed' : 'ongoing')});
         DB.programs.push(saved);
-        DB.acts.push({id:'ACT-' + Date.now(), programId:saved.id, user:'Gerson Jiménez', action:'created the program', ts:new Date().toISOString()});
+        DB.acts.push({id:'ACT-' + Date.now(), programId:saved.id, user:'Michael Vergara', action:'created the program', ts:new Date().toISOString()});
       }
       return clone(saved);
     },
     async addNote(programId, text){
       await latency(); requireAdmin();
-      const n = {id:'NTE-' + Date.now(), programId, author:'Gerson Jiménez', ts:new Date().toISOString(), text};
+      const n = {id:'NTE-' + Date.now(), programId, author:'Michael Vergara', ts:new Date().toISOString(), text};
       DB.notes.push(n);
-      DB.acts.push({id:'ACT-' + Date.now(), programId, user:'Gerson Jiménez', action:'posted an update', ts:n.ts});
+      DB.acts.push({id:'ACT-' + Date.now(), programId, user:'Michael Vergara', action:'posted an update', ts:n.ts});
       return clone(n);
     }
   };
@@ -925,7 +928,7 @@ const launchCell = p => {
 };
 const COL = {
   program:{key:'program', label:'Program', sort:p => p.name.toLowerCase(), render:progLink},
-  category:{key:'category', label:'Category', sort:p => p.category, render:p => catTag(p.category)},
+  category:{key:'category', label:'Category', sort:p => p.category, render:p => p.category ? '<div class="cat-cell"><b>' + esc(p.category) + '</b><div class="sub-line">' + esc(CATEGORY_MEANING[p.category] || '') + '</div></div>' : '<span class="faint">Not set</span>'},
   launch:{key:'launch', label:'Target go-live', sort:p => p.launchDate || '9999-12-31', render:launchCell},
   kickoff:{key:'kickoff', label:'Kick-off', sort:p => p.kickoffDate || '9999-12-31', render:p => p.kickoffDate ? fmtLong(p.kickoffDate) : '<span class="faint">Not set</span>'},
   phase:{key:'phase', label:'Stage', sort:p => PHASES.indexOf(p.phase), render:p => phaseBadge(p.phase)},
@@ -1072,7 +1075,7 @@ PAGES.programs = {title:'Programs', render(host, arg){
   host.innerHTML =
     '<div class="page-head"><div><h1>Programs</h1><p>The rolling portfolio. A program is created once and stays here through its whole lifecycle.</p></div><div class="actions"><button class="btn" type="button" data-act="export" data-what="programs">' + icon('download', 16) + 'Export CSV</button>' + (isAdmin() ? '<button class="btn primary" type="button" data-act="new-program">' + icon('plus', 16) + 'New program</button>' : '') + '</div></div>' +
     '<section class="card"><div class="tabs" role="tablist" aria-label="Program groups">' + tabs.map(t => '<button class="tab" role="tab" type="button" data-tab="' + t[0] + '" aria-selected="' + (st.tab === t[0]) + '">' + t[1] + '<span class="pill">' + counts[t[0]] + '</span></button>').join('') + '</div><div id="pNote"></div><div id="pFilters"></div><div id="pTable"></div><div class="card-foot"><span id="pCount"></span><span>' + (st.tab === 'closed' ? plural(DATA.meta.archived, 'older or undated record') + ' stay in the Monday.com archive.' : '') + '</span></div></section>' +
-    '<div class="legend-note"><b>NCNB</b> New Customer, New Business (New Program) &nbsp;|&nbsp; <b>ECEB</b> Existing Customer, Existing Business (Ramp up) &nbsp;|&nbsp; <b>ECNB</b> Existing Customer, New Business (new LOB or new GEO)</div>';
+    '<div class="legend-note"><b>NCNB</b> New Customer New Business (New Program) &nbsp;|&nbsp; <b>ECEB</b> Existing Customer Existing Business (Ramp up) &nbsp;|&nbsp; <b>ECNB</b> Existing Customer New Business (new LOB or new GEO)</div>';
   $$('.tab', host).forEach(b => b.onclick = () => {
     st.tab = b.dataset.tab; st.status = '';
     st.sort = st.tab === 'closed' ? {key:'closed', dir:'desc'} : {key:'launch', dir:'asc'};
@@ -1384,7 +1387,7 @@ PAGES.admin = {title:'Admin', render(host){
     '<div class="reports">' +
     '<section class="card span-2"><div class="card-h"><h2>Data sources</h2>' + badge('Snapshot ' + fmtLong(DATA.meta.snapshot), 'amber') + '</div><div class="table-scroll" style="margin-top:12px"><table class="dt"><thead><tr><th>Source</th><th>Contents</th><th>Link</th></tr></thead><tbody>' +
     src.map(s => '<tr><td><b>' + esc(s[0]) + '</b></td><td class="muted">' + esc(s[2]) + '</td><td><a class="link" href="' + esc(s[1]) + '" target="_blank" rel="noopener">Open</a></td></tr>').join('') + '</tbody></table></div><div class="card-b"><p class="muted">This page reads a point-in-time copy. In Stage 3 the Google Sheet becomes the live database, read and written through Apps Script.</p></div></section>' +
-    '<section class="card span-2"><div class="card-h"><h2>Users and access</h2><span class="sub">Placeholder roles until Stage 5 maps Google accounts</span></div><div class="table-scroll" style="margin-top:12px"><table class="dt"><thead><tr><th>Name</th><th>Position</th><th>Role</th></tr></thead><tbody>' +
+    '<section class="card span-2"><div class="card-h"><h2>Users and access</h2><span class="sub">Only Michael Vergara is an admin. Everyone else is view-only</span></div><div class="table-scroll" style="margin-top:12px"><table class="dt"><thead><tr><th>Name</th><th>Position</th><th>Role</th></tr></thead><tbody>' +
     S.users.map(u => '<tr><td><div style="display:flex;gap:10px;align-items:center"><div class="avatar">' + initials(u.name) + '</div><b>' + esc(u.name) + '</b></div></td><td class="muted">' + esc(u.kind) + '</td><td>' + badge(u.role, u.role === 'Admin' ? 'blue' : 'slate') + '</td></tr>').join('') + '</tbody></table></div></section>' +
     '<section class="card"><div class="card-h"><h2>Configuration lists</h2></div><div class="card-b" style="display:flex;flex-direction:column;gap:16px"><div><div class="faint" style="margin-bottom:8px">Stages</div>' + chipList(PHASES) + '</div><div><div class="faint" style="margin-bottom:8px">Directors</div>' + chipList(DIRECTORS) + '</div></div></section>' +
     '<section class="card"><div class="card-h"><h2>Category meanings</h2></div><div class="card-b" style="display:flex;flex-direction:column;gap:12px">' + CATEGORIES.map(c => '<div><b>' + c + '</b><div class="muted">' + esc(CATEGORY_MEANING[c]) + '</div></div>').join('') + '</div></section>' +
