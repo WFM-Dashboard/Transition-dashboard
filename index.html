@@ -781,7 +781,10 @@ const reqBadge = s => badge(s, TONES.req[s] || 'slate');
 const sevBadge = s => badge(s, TONES.sev[s] || 'slate');
 const riskBadge = s => badge(s, TONES.risk[s] || 'slate');
 const phaseBadge = s => badge(s, 'purple');
-const catTag = c => c ? '<abbr class="cat" title="' + esc(CATEGORY_MEANING[c] || '') + '">' + esc(c) + '</abbr>' : '<span class="faint">Not set</span>';
+const CAT_TONE = {NCNB:'green', ECNB:'amber', ECEB:'red'};
+const CAT_COLOR = {NCNB:'var(--green)', ECNB:'var(--amber)', ECEB:'var(--red)'};
+const catTag = c => c ? badge(c, CAT_TONE[c] || 'slate') : '<span class="faint">Not set</span>';
+const catFull = c => c ? '<div class="cat-cell">' + catTag(c) + '<div class="sub-line">' + esc(CATEGORY_MEANING[c] || '') + '</div></div>' : '<span class="faint">Not set</span>';
 const pbar = v => v === null || v === undefined ? '<span class="faint">No checklist</span>' : '<div class="pbar" title="' + v + '% of applicable checklist items complete"><span class="track"><span class="fill' + (v >= 100 ? ' done' : '') + '" style="width:' + Math.min(100, v) + '%"></span></span><span class="val">' + v + '%</span></div>';
 const extLink = p => p.mondayUrl ? '<a class="ext" href="' + esc(p.mondayUrl) + '" target="_blank" rel="noopener" title="Open in Monday.com" aria-label="Open ' + esc(p.name) + ' in Monday.com">' + icon('link', 15) + '</a>' : '';
 const progLink = p => '<div class="pcell"><a class="plink" href="#/programs/' + p.id + '"><span class="pn">' + esc(p.name) + '</span><span class="ps">' + esc(p.owner || 'No PM recorded') + '</span></a>' + extLink(p) + '</div>';
@@ -928,7 +931,7 @@ const launchCell = p => {
 };
 const COL = {
   program:{key:'program', label:'Program', sort:p => p.name.toLowerCase(), render:progLink},
-  category:{key:'category', label:'Category', sort:p => p.category, render:p => p.category ? '<div class="cat-cell"><b>' + esc(p.category) + '</b><div class="sub-line">' + esc(CATEGORY_MEANING[p.category] || '') + '</div></div>' : '<span class="faint">Not set</span>'},
+  category:{key:'category', label:'Category', sort:p => p.category, render:p => catFull(p.category)},
   launch:{key:'launch', label:'Target go-live', sort:p => p.launchDate || '9999-12-31', render:launchCell},
   kickoff:{key:'kickoff', label:'Kick-off', sort:p => p.kickoffDate || '9999-12-31', render:p => p.kickoffDate ? fmtLong(p.kickoffDate) : '<span class="faint">Not set</span>'},
   phase:{key:'phase', label:'Stage', sort:p => PHASES.indexOf(p.phase), render:p => phaseBadge(p.phase)},
@@ -1018,7 +1021,7 @@ PAGES.overview = {title:'Overview', render(host){
       '<section class="card"><div class="card-h"><h2>Priority alerts</h2><span class="sub">Needs WFM attention</span></div><div id="alerts" style="margin-top:12px"></div></section>' +
     '</aside></div>';
 
-  const cols = [COL.program, COL.launch, COL.phase, COL.status, COL.reqs, COL.owner, COL.director, COL.progress, COL.risk, COL.updated];
+  const cols = [COL.program, COL.category, COL.launch, COL.phase, COL.status, COL.reqs, COL.owner, COL.director, COL.progress, COL.risk, COL.updated];
   const tHost = $('#ovTable', host);
   const draw = () => {
     const rows = active.filter(programFilterFn(st));
@@ -1075,7 +1078,7 @@ PAGES.programs = {title:'Programs', render(host, arg){
   host.innerHTML =
     '<div class="page-head"><div><h1>Programs</h1><p>The rolling portfolio. A program is created once and stays here through its whole lifecycle.</p></div><div class="actions"><button class="btn" type="button" data-act="export" data-what="programs">' + icon('download', 16) + 'Export CSV</button>' + (isAdmin() ? '<button class="btn primary" type="button" data-act="new-program">' + icon('plus', 16) + 'New program</button>' : '') + '</div></div>' +
     '<section class="card"><div class="tabs" role="tablist" aria-label="Program groups">' + tabs.map(t => '<button class="tab" role="tab" type="button" data-tab="' + t[0] + '" aria-selected="' + (st.tab === t[0]) + '">' + t[1] + '<span class="pill">' + counts[t[0]] + '</span></button>').join('') + '</div><div id="pNote"></div><div id="pFilters"></div><div id="pTable"></div><div class="card-foot"><span id="pCount"></span><span>' + (st.tab === 'closed' ? plural(DATA.meta.archived, 'older or undated record') + ' stay in the Monday.com archive.' : '') + '</span></div></section>' +
-    '<div class="legend-note"><b>NCNB</b> New Customer New Business (New Program) &nbsp;|&nbsp; <b>ECEB</b> Existing Customer Existing Business (Ramp up) &nbsp;|&nbsp; <b>ECNB</b> Existing Customer New Business (new LOB or new GEO)</div>';
+    '<div class="legend-note"><span class="badge b-green">NCNB</span> New Customer New Business (New Program) &nbsp;&nbsp; <span class="badge b-red">ECEB</span> Existing Customer Existing Business (Ramp up) &nbsp;&nbsp; <span class="badge b-amber">ECNB</span> Existing Customer New Business (new LOB or new GEO)</div>';
   $$('.tab', host).forEach(b => b.onclick = () => {
     st.tab = b.dataset.tab; st.status = '';
     st.sort = st.tab === 'closed' ? {key:'closed', dir:'desc'} : {key:'launch', dir:'asc'};
@@ -1127,7 +1130,7 @@ function renderProgramDetail(host, id){
   const sources = (p.mondayUrl ? 'Monday.com' : '') + (p.mondayUrl && p.onSheet ? ' and ' : '') + (p.onSheet ? 'Q2 2026 Checklist sheet' : '');
   host.innerHTML =
     '<div class="crumbs"><a href="#/programs">Programs</a><span>/</span><span>' + esc(p.name) + '</span></div>' +
-    '<section class="card dh"><div class="dh-top"><div><h1>' + esc(p.name) + '</h1><div class="client">' + (p.category ? catTag(p.category) + ', ' + esc(CATEGORY_MEANING[p.category]) : 'Category not set') + '</div></div><div class="actions">' +
+    '<section class="card dh"><div class="dh-top"><div><h1>' + esc(p.name) + '</h1><div class="client">' + (p.category ? catTag(p.category) + ' ' + esc(CATEGORY_MEANING[p.category]) : 'Category not set') + '</div></div><div class="actions">' +
     (p.mondayUrl ? '<a class="btn" href="' + esc(p.mondayUrl) + '" target="_blank" rel="noopener">' + icon('link', 16) + 'Open in Monday.com</a>' : '') +
     (p.onSheet ? '<a class="btn" href="' + esc(DATA.meta.sheetUrl) + '" target="_blank" rel="noopener">' + icon('file', 16) + 'Open checklist sheet</a>' : '') +
     '<a class="btn" href="#/programs">Back to programs</a>' + (isAdmin() ? '<button class="btn primary" type="button" data-act="edit-program" data-id="' + p.id + '">' + icon('edit', 16) + 'Edit program</button>' : '') + '</div></div>' +
@@ -1135,7 +1138,7 @@ function renderProgramDetail(host, id){
     (p.group === 'closed' ? '<div class="callout" style="margin-top:18px">' + icon('calendar', 20) + '<div><b>' + esc(p.outcome || 'Closed') + (p.closedDate ? ' on ' + fmtLong(p.closedDate) : '') + '.</b> ' + (p.closedDate ? 'Date source: ' + esc(p.closedBasis) + '.' : 'Closure date is not recorded in Monday.com; listed because go-live was on or after Nov 1.') + '</div></div>' : '') +
     '<dl class="meta-grid"><div><dt>WFM PM</dt><dd>' + (p.owner ? esc(p.owner) : '<span class="faint">Not recorded</span>') + '</dd></div><div><dt>Director</dt><dd>' + esc(p.director) + '</dd></div><div><dt>Stage</dt><dd>' + phaseBadge(p.phase) + '</dd></div><div><dt>Overall status</dt><dd>' + progBadge(p.status) + '</dd></div><div><dt>Target go-live</dt><dd>' + (p.launchDate ? fmtLong(p.launchDate) + '<div class="sub-line">' + relDate(p.launchDate) + '</div>' : '<span class="faint">Not set</span>') + '</dd></div><div><dt>Checklist progress</dt><dd>' + pbar(p.progress) + '</dd></div></dl>' +
     (p.group === 'closed' ? '' : '<div class="steps" role="group" aria-label="Program stage">' + steps + '</div>') + '</section>' +
-    sectionBox('summary', 'Program summary', null, '<p class="summary-text">' + esc(p.summary || 'No summary yet.') + (p.notes ? ' Latest status: ' + esc(p.notes) : '') + '</p><dl class="kv"><div><dt>Category</dt><dd>' + catTag(p.category) + '</dd></div><div><dt>SOW</dt><dd>' + (p.sow ? esc(p.sow) : '<span class="faint">Not recorded</span>') + '</dd></div><div><dt>Kick-off</dt><dd>' + (p.kickoffDate ? fmtLong(p.kickoffDate) : '<span class="faint">Not set</span>') + '</dd></div><div><dt>Next milestone</dt><dd>' + esc(o.nextMilestone || 'None') + '</dd></div><div><dt>Source</dt><dd>' + esc(sources || 'Monday.com') + '</dd></div><div><dt>Last updated</dt><dd>' + (p.lastUpdated ? fmtLong(p.lastUpdated) : '') + '</dd></div><div><dt>Open risks</dt><dd>' + o.risks.filter(openRisk).length + '</dd></div><div><dt>Overdue tasks</dt><dd>' + (o.overdue ? '<span class="t-red">' + o.overdue + '</span>' : '0') + '</dd></div></dl>', true) +
+    sectionBox('summary', 'Program summary', null, '<p class="summary-text">' + esc(p.summary || 'No summary yet.') + (p.notes ? ' Latest status: ' + esc(p.notes) : '') + '</p><dl class="kv"><div><dt>Category</dt><dd>' + catFull(p.category) + '</dd></div><div><dt>SOW</dt><dd>' + (p.sow ? esc(p.sow) : '<span class="faint">Not recorded</span>') + '</dd></div><div><dt>Kick-off</dt><dd>' + (p.kickoffDate ? fmtLong(p.kickoffDate) : '<span class="faint">Not set</span>') + '</dd></div><div><dt>Next milestone</dt><dd>' + esc(o.nextMilestone || 'None') + '</dd></div><div><dt>Source</dt><dd>' + esc(sources || 'Monday.com') + '</dd></div><div><dt>Last updated</dt><dd>' + (p.lastUpdated ? fmtLong(p.lastUpdated) : '') + '</dd></div><div><dt>Open risks</dt><dd>' + o.risks.filter(openRisk).length + '</dd></div><div><dt>Overdue tasks</dt><dd>' + (o.overdue ? '<span class="t-red">' + o.overdue + '</span>' : '0') + '</dd></div></dl>', true) +
     sectionBox('reqs', 'WFM requirements (checklist workstreams)', o.reqTotal ? o.reqDone + ' of ' + o.reqTotal : null, o.reqTotal ? '<div class="table-scroll"><table class="dt">' + th(['Workstream','Owner','Status','Notes']) + '<tbody>' + reqRows + '</tbody></table></div>' : emptyState('No checklist recorded', 'Closed programs and brand-new programs may not have a checklist yet.'), true) +
     sectionBox('tasks', 'Open tasks', o.tasks.length, o.tasks.length ? '<div class="table-scroll"><table class="dt">' + th(['Open workstream','Owner','Target go-live','Status','Priority']) + '<tbody>' + taskRows + '</tbody></table></div>' : emptyState('No open tasks', 'Every checklist workstream is complete.'), true) +
     sectionBox('miles', 'Milestones', o.miles.length, o.miles.length ? '<ul class="timeline">' + msList + '</ul>' : emptyState('No dates recorded', 'Kick-off and go-live dates are not set in Monday.com.'), true) +
@@ -1186,7 +1189,7 @@ PAGES.pipeline = {title:'Launch pipeline', render(host){
     return '<div class="col"><div class="col-h"><span>' + ph + '</span><span class="pill">' + ps.length + '</span></div>' + (ps.length ? ps.map(p => {
       const i = info(p), d = i.d;
       const flags = (i.blocked ? '<span class="flag red">' + plural(i.o.blockers, 'serious issue') + '</span>' : '') + (i.missing ? '<span class="flag orange">' + plural(i.o.reqOpen, 'workstream') + ' open</span>' : '') + (i.ready ? '<span class="flag green">All complete</span>' : '');
-      return '<a class="pcard" href="#/programs/' + p.id + '"><b>' + esc(p.name) + '</b><div class="c">' + catTag(p.category) + ', ' + esc(p.director) + '</div><div class="d"><span>' + (p.launchDate ? fmtShort(p.launchDate) : 'No go-live date') + '</span><span class="' + (d !== null && d >= 0 && d <= 7 ? 't-orange' : '') + '">' + (p.launchDate ? relDate(p.launchDate) : '') + '</span></div>' + pbar(p.progress) + '<div class="flags">' + progBadge(p.status) + flags + '</div></a>';
+      return '<a class="pcard" href="#/programs/' + p.id + '"><b>' + esc(p.name) + '</b><div class="c">' + catFull(p.category) + '<div style="margin-top:4px">' + esc(p.director) + '</div></div><div class="d"><span>' + (p.launchDate ? fmtShort(p.launchDate) : 'No go-live date') + '</span><span class="' + (d !== null && d >= 0 && d <= 7 ? 't-orange' : '') + '">' + (p.launchDate ? relDate(p.launchDate) : '') + '</span></div>' + pbar(p.progress) + '<div class="flags">' + progBadge(p.status) + flags + '</div></a>';
     }).join('') : '<div class="faint" style="font-size:12.5px;padding-top:12px">Nothing here</div>') + '</div>';
   }).join('');
 }};
@@ -1348,7 +1351,7 @@ PAGES.reports = {title:'Reports', render(host){
   const activeReqs = S.reqs.filter(r => prog(r.programId) && inFlight(prog(r.programId)));
   const reqItems = REQ_CATS.map(c => { const l = activeReqs.filter(r => r.category === c); return {l:REQ_SHORT[c] + ' (' + l.length + ')', v:l.length ? Math.round(l.filter(r => r.status === 'Complete').length / l.length * 100) : 0, c:'var(--green)'}; });
   const dirItems = DIRECTORS.map(d => ({l:d, v:ongoing.filter(p => p.directors.includes(d)).length, c:'var(--blue)'})).filter(i => i.v);
-  const catItems = CATEGORIES.map(c => ({l:c + ' ' + CATEGORY_MEANING[c].split(' (')[0], v:ongoing.filter(p => p.category === c).length, c:'var(--purple)'}));
+  const catItems = CATEGORIES.map(c => ({l:c + ' ' + CATEGORY_MEANING[c].split(' (')[0], v:ongoing.filter(p => p.category === c).length, c:CAT_COLOR[c]}));
   const upcoming = active.filter(p => p.launchDate && daysTo(p.launchDate) >= 0 && daysTo(p.launchDate) <= 60).sort((a, b) => a.launchDate < b.launchDate ? -1 : 1);
   const early = active.filter(p => ['Pre-Launch','Training / Nesting','Launch'].includes(p.phase)).sort((a, b) => (a.launchDate || '9999').localeCompare(b.launchDate || '9999'));
   const ready = early.map(p => { const o = S.ix[p.id]; const rp = o.reqTotal ? o.reqDone / o.reqTotal * 100 : 0; const score = Math.round(0.5 * (p.progress || 0) + 0.3 * rp + 0.2 * (o.blockers ? 0 : 100)); return {p, o, score}; });
@@ -1390,7 +1393,7 @@ PAGES.admin = {title:'Admin', render(host){
     '<section class="card span-2"><div class="card-h"><h2>Users and access</h2><span class="sub">Only Michael Vergara is an admin. Everyone else is view-only</span></div><div class="table-scroll" style="margin-top:12px"><table class="dt"><thead><tr><th>Name</th><th>Position</th><th>Role</th></tr></thead><tbody>' +
     S.users.map(u => '<tr><td><div style="display:flex;gap:10px;align-items:center"><div class="avatar">' + initials(u.name) + '</div><b>' + esc(u.name) + '</b></div></td><td class="muted">' + esc(u.kind) + '</td><td>' + badge(u.role, u.role === 'Admin' ? 'blue' : 'slate') + '</td></tr>').join('') + '</tbody></table></div></section>' +
     '<section class="card"><div class="card-h"><h2>Configuration lists</h2></div><div class="card-b" style="display:flex;flex-direction:column;gap:16px"><div><div class="faint" style="margin-bottom:8px">Stages</div>' + chipList(PHASES) + '</div><div><div class="faint" style="margin-bottom:8px">Directors</div>' + chipList(DIRECTORS) + '</div></div></section>' +
-    '<section class="card"><div class="card-h"><h2>Category meanings</h2></div><div class="card-b" style="display:flex;flex-direction:column;gap:12px">' + CATEGORIES.map(c => '<div><b>' + c + '</b><div class="muted">' + esc(CATEGORY_MEANING[c]) + '</div></div>').join('') + '</div></section>' +
+    '<section class="card"><div class="card-h"><h2>Category meanings</h2></div><div class="card-b" style="display:flex;flex-direction:column;gap:12px">' + CATEGORIES.map(c => '<div>' + catTag(c) + '<div class="muted" style="margin-top:4px">' + esc(CATEGORY_MEANING[c]) + '</div></div>').join('') + '</div></section>' +
     '</div>';
 }};
 
