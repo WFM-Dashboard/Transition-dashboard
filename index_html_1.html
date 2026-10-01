@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Transitions Portfolio — WFM Center of Excellence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg: #0D0D0D;
+    --bg-deep: #000000;
+    --panel: #1A1A1A;
+    --panel-raised: #262626;
+    --line: #3D3D3D;
+    --text: #F5F5F5;
+    --text-dim: #B3B3B3;
+    --text-faint: #737373;
+    --red: #E5484D;
+    --red-dim: #4D2426;
+    --amber: #F5A623;
+    --amber-dim: #4A3A1A;
+    --green: #3DD16D;
+    --green-dim: #1E3D28;
+    --blue: #999999;
+    --purple: #999999;
+    --purple-deep: #F5F5F5;
+    --accent-green: #FFFFFF;
+    --font-head: Verdana, Geneva, sans-serif;
+    --font-data: Verdana, Geneva, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-head);line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px 100px;}
+
+  .masthead{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;background:linear-gradient(150deg, #262626 0%, #000000 100%);color:#fff;padding:44px 40px 36px;margin:0 -28px 40px;}
+  .masthead h1{font-size:36px;font-weight:700;margin:0 0 8px 0;letter-spacing:-0.01em;color:#fff;}
+  .masthead .sub{color:#B3B3B3;font-size:14.5px;max-width:600px;}
+  .masthead .meta{text-align:right;font-family:var(--font-data);font-size:12.5px;color:#8A8A8A;line-height:1.7;}
+  .meta .pulse{color:var(--accent-green);}
+  .meta .pulse::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent-green);margin-right:6px;box-shadow:0 0 6px var(--accent-green);}
+
+  .pulse-row{display:grid;grid-template-columns: 1.3fr 1fr 1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:40px;border-radius:8px;overflow:hidden;box-shadow:0 10px 28px rgba(75,40,109,0.10);margin-top:-58px;position:relative;z-index:2;}
+  .pulse-cell{background:var(--panel);padding:22px 20px;}
+  .pulse-cell .label{font-size:11.5px;color:var(--text-faint);margin-bottom:10px;}
+  .pulse-cell .big{font-family:var(--font-data);font-size:36px;font-weight:600;line-height:1;}
+  .pulse-cell .sub-label{font-size:12px;color:var(--text-dim);margin-top:6px;}
+  .owner-bars{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .owner-bar-row{display:grid;grid-template-columns:100px 1fr 40px;align-items:center;gap:8px;font-size:12px;}
+  .owner-bar-track{height:6px;background:var(--bg-deep);overflow:hidden;border-radius:3px;}
+  .owner-bar-fill{height:100%;background:var(--purple);border-radius:3px;}
+  .owner-bar-row .count{font-family:var(--font-data);color:var(--text-dim);text-align:right;}
+
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+  .section-head h2{font-size:19px;margin:0;font-weight:600;color:var(--purple-deep);}
+  .section-head .note{font-size:12.5px;color:var(--text-faint);font-family:var(--font-data);}
+  section{margin-bottom:44px;}
+
+  .stage-chart{display:flex;flex-direction:column;gap:14px;}
+  .stage-row{display:grid;grid-template-columns:140px 1fr 50px;align-items:center;gap:14px;}
+  .stage-row .owner{font-size:13.5px;color:var(--text-dim);}
+  .stage-track{display:flex;height:22px;background:var(--bg-deep);width:100%;overflow:hidden;border-radius:4px;}
+  .stage-seg{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-data);font-size:10.5px;color:#000;font-weight:600;}
+  .stage-row .total{font-family:var(--font-data);text-align:right;color:var(--text-dim);font-size:13px;}
+  .stage-legend{display:flex;gap:18px;margin-top:16px;flex-wrap:wrap;font-size:12px;color:var(--text-dim);}
+  .stage-legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:10px;height:10px;display:inline-block;border-radius:2px;}
+
+  .split-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .split-cell{background:var(--panel);padding:20px 22px;}
+  .split-cell h3{margin:0 0 14px 0;font-size:14.5px;font-weight:600;color:var(--text-dim);}
+  .health-row{display:grid;grid-template-columns:90px 1fr 34px;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+  .health-track{height:14px;background:var(--bg-deep);overflow:hidden;border-radius:3px;}
+  .health-fill{height:100%;}
+  .health-row .n{font-family:var(--font-data);text-align:right;color:var(--text-dim);}
+  .cat-row{display:grid;grid-template-columns:90px 1fr 34px;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+  .cat-track{height:14px;background:var(--bg-deep);overflow:hidden;border-radius:3px;}
+  .cat-fill{height:100%;background:var(--purple);}
+
+  .catdef-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:22px;}
+  .catdef-card{background:var(--panel);padding:22px 22px 20px;}
+  .catdef-card .tag{display:inline-block;font-family:var(--font-data);font-size:12px;font-weight:700;color:#fff;background:var(--purple);padding:3px 9px;border-radius:4px;margin-bottom:12px;}
+  .catdef-card .fullname{font-size:13px;font-weight:600;color:var(--purple-deep);margin-bottom:8px;line-height:1.4;}
+  .catdef-card .desc{font-size:12.5px;color:var(--text-dim);line-height:1.55;margin-bottom:14px;}
+  .catdef-card .count{font-family:var(--font-data);font-size:26px;font-weight:600;color:var(--purple);line-height:1;}
+  .catdef-card .count-label{font-size:11px;color:var(--text-faint);margin-top:2px;margin-bottom:12px;}
+  .catdef-card .examples{font-size:11.5px;color:var(--text-faint);border-top:1px dashed var(--line);padding-top:10px;}
+  .catdef-card .examples b{color:var(--text-dim);font-weight:600;}
+  @media (max-width:760px){.catdef-grid{grid-template-columns:1fr;}}
+
+  .flag-log{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .flag-entry{background:var(--panel);padding:16px 20px;display:grid;grid-template-columns: 200px 1fr;gap:20px;border-left:4px solid var(--red);}
+  .flag-entry.sev-med{border-left-color:var(--amber);}
+  .flag-entry .fname{font-weight:600;font-size:14.5px;color:var(--purple-deep);}
+  .flag-entry .ftag{display:inline-block;margin-top:6px;font-family:var(--font-data);font-size:11px;color:var(--red); border:1px solid var(--red-dim); background:var(--red-dim); padding:2px 6px;border-radius:3px;}
+  .flag-entry.sev-med .ftag{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-dim);}
+  .flag-entry .fbody .fheadline{font-size:13.5px;color:var(--text);margin-bottom:4px;}
+  .flag-entry .fbody .fdetail{font-size:13px;color:var(--text-dim);}
+
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .controls button{background:var(--panel);border:1px solid var(--line);color:var(--text-dim);font-family:var(--font-data);font-size:12px;padding:7px 13px;cursor:pointer;border-radius:5px;}
+  .controls button.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .search-box{background:var(--panel);border:1px solid var(--line);color:var(--text);font-family:var(--font-data);font-size:12.5px;padding:7px 12px;flex:1;min-width:160px;border-radius:5px;}
+  .search-box::placeholder{color:var(--text-faint);}
+
+  .tabs{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:0;border-radius:8px 8px 0 0;overflow:hidden;}
+  .tabs button{flex:1;background:var(--panel);border:none;color:var(--text-dim);font-family:var(--font-head);font-size:13.5px;font-weight:500;padding:12px 10px;cursor:pointer;}
+  .tabs button.active{background:var(--purple);color:#fff;}
+  .tabs button .n{font-family:var(--font-data);color:var(--text-faint);font-size:11.5px;display:block;margin-top:2px;}
+  .tabs button.active .n{color:#D9C9EA;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--panel);}
+  thead th{text-align:left;font-family:var(--font-data);font-size:10.5px;color:var(--text-faint);padding:9px 12px;border-bottom:1px solid var(--line);font-weight:500;}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--text);vertical-align:top;}
+  tbody tr:hover{background:var(--panel-raised);}
+  tbody tr:last-child td{border-bottom:none;}
+  .proj-name{font-weight:600;color:var(--purple-deep);}
+  a.proj-link{text-decoration:none;border-bottom:1px dotted var(--text-faint);cursor:pointer;}
+  a.proj-link:hover{color:var(--text);border-bottom-color:var(--text);}
+  a.proj-link::after{content:" ↗";font-size:10px;color:var(--text-faint);}
+  .cat-tag{font-family:var(--font-data);font-size:11px;color:var(--text-dim);}
+  .stage-tag{font-size:11.5px;color:var(--text-dim);}
+  .sow-tag{font-size:11.5px;color:var(--text-dim);font-family:var(--font-data);}
+  .checklist-cell{font-family:var(--font-data);white-space:nowrap;}
+  .mini-track{display:inline-block;width:50px;height:5px;background:var(--bg-deep);margin-right:8px;vertical-align:middle;border-radius:3px;}
+  .mini-fill{height:100%;display:inline-block;vertical-align:top;border-radius:3px;}
+  .notes-cell{color:var(--text-dim);max-width:300px;}
+  .date-cell{font-family:var(--font-data);font-size:11.5px;color:var(--text-dim);white-space:nowrap;}
+  .flag-chip{font-family:var(--font-data);font-size:10.5px;padding:3px 7px;display:inline-block;border:1px solid;border-radius:4px;}
+  .flag-chip.RED{color:var(--red);border-color:var(--red-dim);background:var(--red-dim);}
+  .flag-chip.WATCH{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-dim);}
+  .flag-chip.ONTRACK{color:var(--green);border-color:var(--green-dim);background:var(--green-dim);}
+  .flag-chip.NA{color:var(--text-faint);border-color:var(--line);}
+  .table-wrap{border:1px solid var(--line);overflow-x:auto;border-radius:8px;}
+
+  .hold-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .hold-card{background:var(--panel);padding:18px 20px;}
+  .hold-card .hname{font-weight:600;font-size:14.5px;margin-bottom:10px;color:var(--purple-deep);}
+  .hold-card .hrow{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-dim);padding:4px 0;border-bottom:1px dashed var(--line);}
+  .hold-card .hrow:last-of-type{border-bottom:none;}
+  .hold-card .hrow .v{font-family:var(--font-data);color:var(--text);}
+  .hold-card .hnote{margin-top:10px;font-size:12.5px;color:var(--amber);}
+
+  .legacy-card{background:var(--panel);border:1px solid var(--line);padding:22px 26px;display:flex;gap:32px;flex-wrap:wrap;align-items:center;border-radius:8px;}
+  .legacy-stat{text-align:left;}
+  .legacy-stat .n{font-family:var(--font-data);font-size:30px;font-weight:600;color:var(--purple);}
+  .legacy-stat .l{font-size:12px;color:var(--text-faint);margin-top:4px;max-width:200px;}
+  .legacy-note{flex:1;min-width:220px;font-size:12.5px;color:var(--text-dim);}
+
+  .callout{border:1px solid var(--purple);background:var(--panel-raised);padding:16px 20px;font-size:13.5px;color:var(--text);margin-top:18px;border-radius:6px;}
+  .callout strong{color:var(--purple);}
+
+
+  .dirbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 0;margin-bottom:28px;border-bottom:1px solid var(--line);}
+  .dirbar .lbl{font-size:12px;color:var(--text-faint);margin-right:4px;}
+  .dirbar button{background:var(--panel);border:1px solid var(--line);color:var(--text-dim);font-family:var(--font-data);font-size:12px;padding:7px 13px;cursor:pointer;border-radius:5px;}
+  .dirbar button.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .dirbar button .n{color:var(--text-faint);margin-left:7px;}
+  .dirbar button.active .n{color:#D9C9EA;}
+  .dirbar .scope{font-size:11.5px;color:var(--text-faint);margin-left:auto;}
+  .cat-legend{font-size:12px;color:var(--text-faint);margin:0 0 12px;line-height:1.7;}
+  .cat-legend b{color:var(--text-dim);font-weight:600;}
+  .hold-card .hreason{margin-top:10px;font-size:12.5px;color:var(--text);border-left:3px solid var(--amber);padding:6px 10px;background:var(--panel-raised);border-radius:0 4px 4px 0;}
+  .hold-card .hreason .k{display:block;font-size:11px;color:var(--text-faint);margin-bottom:2px;}
+  .hold-card .hreason.missing{color:var(--amber);}
+  .hold-card a.hname{display:block;text-decoration:none;}
+
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--font-data);font-size:11.5px;color:var(--text-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+  @media (max-width:900px){.pulse-row{grid-template-columns:1fr 1fr;} .split-row{grid-template-columns:1fr;}}
+  @media (max-width:720px){.flag-entry{grid-template-columns:1fr;} .stage-row{grid-template-columns:100px 1fr 40px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1>Transitions</h1>
+      <div class="sub">WFM Center of Excellence — portfolio pulse across Gerson Jiménez, Elle Kumari and Michael Vergara.</div>
+    </div>
+    <div class="meta">
+      v.4.0 · October 2026<br>
+      <span class="pulse">synced from monday.com · Oct 1, 2026</span><br>
+      via "Transitions Summary" + "Active Transitions" boards + Elle's Q2 2026 Checklist (Sheets)
+    </div>
+  </div>
+
+  <!-- PULSE ROW -->
+  <div class="pulse-row">
+    <div class="pulse-cell">
+      <div class="label">Ongoing projects</div>
+      <div class="big" style="color:var(--blue);">43</div>
+      <div class="owner-bars">
+        <div class="owner-bar-row"><span>Gerson Jiménez</span><div class="owner-bar-track"><div class="owner-bar-fill" style="width:100%"></div></div><span class="count">27</span></div>
+        <div class="owner-bar-row"><span>Elle Kumari</span><div class="owner-bar-track"><div class="owner-bar-fill" style="width:37%"></div></div><span class="count">10</span></div>
+        <div class="owner-bar-row"><span>Michael Vergara</span><div class="owner-bar-track"><div class="owner-bar-fill" style="width:22%"></div></div><span class="count">6</span></div>
+      </div>
+    </div>
+    <div class="pulse-cell">
+      <div class="label">On hold</div>
+      <div class="big" style="color:var(--red);">4</div>
+      <div class="sub-label">0% Checklist Progress, all Gerson-owned. Not in the ongoing count</div>
+    </div>
+    <div class="pulse-cell">
+      <div class="label">Avg. Checklist Progress</div>
+      <div class="big" style="color:var(--amber);">46%</div>
+      <div class="sub-label">completed ÷ applicable items, across 43 ongoing projects</div>
+    </div>
+    <div class="pulse-cell">
+      <div class="label">Red-flag projects</div>
+      <div class="big" style="color:var(--red);">15</div>
+      <div class="sub-label">Checklist Progress &lt; 30% (excludes 2 just created)</div>
+    </div>
+    <div class="pulse-cell">
+      <div class="label">Closed since Nov 2025</div>
+      <div class="big" style="color:var(--text-dim);">17</div>
+      <div class="sub-label">shown separately below; 128 older/undated records archived</div>
+    </div>
+  </div>
+
+  <!-- STAGE DISTRIBUTION -->
+  <section>
+    <div class="section-head">
+      <h2>Projects by stage</h2>
+      <div class="note">8 pre-launch · 6 training/nesting · 2 launch · 25 BAU post-launch · 2 unassigned</div>
+    </div>
+    <div class="stage-chart" id="stageChart"></div>
+    <div class="stage-legend">
+      <span><span class="swatch" style="background:#E5484D"></span>Pre-Launch</span>
+      <span><span class="swatch" style="background:#F5A623"></span>Training / Nesting</span>
+      <span><span class="swatch" style="background:#8BC34A"></span>Launch</span>
+      <span><span class="swatch" style="background:#3DD16D"></span>BAU Post Launch</span>
+    </div>
+    <div class="callout">
+      <strong>Note —</strong> Michael Vergara's 6 projects (3 Pre-Launch, 1 Training/Nesting and 2 just created with no stage yet) are newly assigned programs; Gerson is working these alongside him so Michael can ramp up on the workflow.
+    </div>
+  </section>
+
+  <!-- CATEGORY DEFINITIONS + MIX -->
+  <section>
+    <div class="section-head">
+      <h2>Category mix</h2>
+      <div class="note">ongoing projects only · source: monday.com</div>
+    </div>
+
+    <div class="catdef-grid">
+      <div class="catdef-card">
+        <span class="tag" style="background:#E5484D;">NCNB</span>
+        <div class="fullname">New Customer, New Business</div>
+        <div class="desc"><b>New Program</b> — a brand-new program for a brand-new client.</div>
+        <div class="count">25</div>
+        <div class="count-label">of 43 ongoing projects</div>
+        <div class="examples"><b>Examples:</b> Centene - IN, INTUIT - SV, Equals - Indo</div>
+      </div>
+      <div class="catdef-card">
+        <span class="tag" style="background:#F5A623;color:#1A1A1A;">ECNB</span>
+        <div class="fullname">Existing Customer, New Business</div>
+        <div class="desc"><b>New LOB or new GEO</b> — an existing client opening a new line of business or a new geography.</div>
+        <div class="count">13</div>
+        <div class="count-label">of 43 ongoing projects</div>
+        <div class="examples"><b>Examples:</b> Uber - IN, CIBC - MA, Wayfair - ZA</div>
+      </div>
+      <div class="catdef-card">
+        <span class="tag" style="background:#3DD16D;color:#1A1A1A;">ECEB</span>
+        <div class="fullname">Existing Customer, Existing Business</div>
+        <div class="desc"><b>Ramp up</b> — an existing client scaling up an existing business.</div>
+        <div class="count">5</div>
+        <div class="count-label">of 43 ongoing projects</div>
+        <div class="examples"><b>Examples:</b> TEMU - PH, Wayfair - IN, Tiktok MI Ramp</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RED FLAGS -->
+  <section>
+    <div class="section-head">
+      <h2>Red flags &amp; escalations</h2>
+      <div class="note">priority items, current monday.com status</div>
+    </div>
+    <div class="flag-log" id="flagLog"></div>
+  </section>
+
+  <!-- DIRECTOR FILTER (applies to watchlist, project list, on hold and closed) -->
+  <div class="dirbar" id="dirBar" role="group" aria-label="Filter by WFM director"></div>
+
+  <!-- LOWEST CHECKLIST PROGRESS WATCHLIST -->
+  <section>
+    <div class="section-head">
+      <h2>Watchlist — lowest Checklist Progress</h2>
+      <div class="note">ongoing projects under 10% Checklist Progress</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Project</th><th>WFM PM</th><th>Director</th><th>Stage</th><th>Checklist Progress</th><th>Notes</th></tr></thead>
+        <tbody id="watchlistBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ACTIVE PROJECTS -->
+  <section>
+    <div class="section-head">
+      <h2>Active projects — full list</h2>
+      <div class="note">43 ongoing (excludes on hold and closed) — filter by director, owner, search by name</div>
+    </div>
+    <div class="tabs" id="ownerTabs"></div>
+    <div class="controls" style="margin-top:14px;">
+      <input class="search-box" id="searchBox" placeholder="Search project, director or notes…">
+      <button data-flagfilter="ALL" class="active">All flags</button>
+      <button data-flagfilter="RED">Red &lt;30%</button>
+      <button data-flagfilter="WATCH">Watch 30–79%</button>
+      <button data-flagfilter="ONTRACK">On track ≥80%</button>
+    </div>
+    <div class="cat-legend"><b>NCNB</b> New Customer, New Business (New Program) &nbsp;|&nbsp; <b>ECEB</b> Existing Customer, Existing Business (Ramp up) &nbsp;|&nbsp; <b>ECNB</b> Existing Customer, New Business (new LOB or new GEO)</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Project</th><th>Category</th><th>Stage</th><th>Director</th><th>Kickoff</th><th>Target Go-Live</th><th>SOW</th><th>Checklist Progress</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="projTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ON HOLD -->
+  <section>
+    <div class="section-head">
+      <h2>On hold</h2>
+      <div class="note">not counted in the ongoing total above — all owned by Gerson Jiménez</div>
+    </div>
+    <div class="hold-grid" id="holdGrid"></div>
+    <div class="callout">
+      <strong>Recommended next step —</strong> record why each program is paused. The Monday.com "Reason" column is empty for all four, so directors cannot see the blocker from the board. Then confirm with account/sales whether each program is still active: Ramble (11 months since kickoff) and VinFast (8 months past target go-live) need a firm restart date, or a move to Closed so the ongoing pipeline reflects real work in flight.
+    </div>
+  </section>
+
+  <!-- CLOSED SINCE NOV -->
+  <section>
+    <div class="section-head">
+      <h2>Closed projects — since Nov 2025</h2>
+      <div class="note">separated from the ongoing portfolio above and excluded from its counts</div>
+    </div>
+    <div class="legacy-card">
+      <div class="legacy-stat"><div class="n">17</div><div class="l">closed, handed over, sunset or canceled since Nov 1, 2025</div></div>
+      <div class="legacy-stat"><div class="n">128</div><div class="l">older or undated records (go-live before Nov 2025, or no dates on the board)</div></div>
+      <div class="legacy-note">Closed date is the Closing Date, else the WFM or PMO handover date on the Monday.com board. Where none is recorded, the program is listed because its go-live fell on or after Nov 1, 2025, so it cannot have closed earlier.</div>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table>
+        <thead><tr><th>Project</th><th>Category</th><th>Stage</th><th>WFM PM</th><th>Director</th><th>Go-Live</th><th>Closed / Handed Over</th><th>Date source</th></tr></thead>
+        <tbody id="closedBody"></tbody>
+      </table>
+    </div>
+    <div class="cat-legend" style="margin-top:10px;">Not counted: "Cloaked Inc." (a duplicate of the ongoing Cloaked, Inc.) and "FedEx - PH" (Pre-Launch, created Sep 10, 2026) sit in Monday's Closed group but look misplaced. Confirm and move them.</div>
+  </section>
+
+  <footer>
+    <span>TELUS Digital — Confidential</span>
+    <span>Source: monday.com "Transitions Summary" + "Active Transitions" boards; Elle Kumari's Q2 2026 Transitions Checklist (Google Sheets)</span>
+  </footer>
+
+</div>
+
+<script>
+const STAGE_COLORS = { "Pre-Launch": "#E5484D", "Training / Nesting": "#F5A623", "Launch": "#8BC34A", "BAU Post Launch": "#3DD16D" };
+
+const stageData = [{"owner": "Gerson Jiménez", "stages": {"Pre-Launch": 3, "Training / Nesting": 1, "Launch": 2, "BAU Post Launch": 21}, "total": 27}, {"owner": "Elle Kumari", "stages": {"Pre-Launch": 2, "Training / Nesting": 4, "Launch": 0, "BAU Post Launch": 4}, "total": 10}, {"owner": "Michael Vergara", "stages": {"Pre-Launch": 3, "Training / Nesting": 1, "Launch": 0, "BAU Post Launch": 0}, "total": 6}];
+
+const CAT_MEANING = {"NCNB": "New Customer, New Business (New Program)", "ECNB": "Existing Customer, New Business (new LOB or new GEO)", "ECEB": "Existing Customer, Existing Business (Ramp up)"};
+
+const redFlags = [{"sev": "high", "name": "Splashdot - US", "tag": "BAU Post Launch — go-live date passed", "headline": "Blocked on the Five9 POC fix; WFM cannot see TMs.", "detail": "Checklist Progress 0%."}, {"sev": "high", "name": "Ticketmaster - ZA / Uber - IN", "tag": "Go-live date passed (Sep 21)", "headline": "Both programs are still in Launch stage, 10 days past their Sep 21 target go-live.", "detail": "Checklist Progress 9% and 0%. Ticketmaster is waiting on client tooling access; Uber hiring (12 RTAs, 1 Sr RTA, 3 Schedulers, 1 Planner, 2 WFM TL) is still open."}, {"sev": "high", "name": "4 programs on hold", "tag": "Chase Bank-GT, Ramble-SV, Rockstar Games-IN, VinFast-PH", "headline": "0% Checklist Progress, and no hold reason is recorded in Monday.com for any of them.", "detail": "Ramble (11 months since kickoff) and VinFast (8 months past target go-live) have been stalled longest. See the On hold section."}, {"sev": "high", "name": "Tiktok BKK, HAN, SUB / Sport Alliance Ramp", "tag": "New — Elle Kumari", "headline": "Two new expansion/ramp projects surfaced in the Q2 2026 Checklist sheet and are not yet on the Monday board.", "detail": "Checklist Progress 6% and 3%; almost all WFM Support, Scheduling and Intraday items are still Not Started."}, {"sev": "med", "name": "Stryker - ZA, TFG London - ZA, Sparklight/Cable One", "tag": "Live with active escalations", "headline": "20%, 18% and 17% Checklist Progress respectively.", "detail": "All three carry open Ops/data-accuracy escalations post-launch."}, {"sev": "med", "name": "Bank of Montreal (BMO) - MA", "tag": "Live since April, still 50%", "headline": "WFM implementation guide pending 5+ months since go-live.", "detail": ""}, {"sev": "med", "name": "SNOW / ANF rollout decision", "tag": "Systemic blocker across 8 accounts", "headline": "Doordash-PH, Wayfair-MA/IN, Doordash DX&CX-PH, TEMU-PH, Western Union-ZA, H&R Block, Robinhood-MA.", "detail": "All waiting on the same SNOW implementation and PMA/Amanda rollout decision."}, {"sev": "med", "name": "Cloaked, Inc. / Kaufland Bosnia & Herzegovina", "tag": "Training / Nesting — Elle Kumari", "headline": "Checklist Progress 33% and 42% per the Q2 2026 Checklist sheet.", "detail": "Cloaked, Inc. has moved from Pre-Launch to Nesting, and Kaufland Bosnia from Pre-Launch to Training, but both still have Scheduling/Intraday items outstanding."}, {"sev": "med", "name": "SimpliSafe", "tag": "Possible stale status", "headline": "Monday shows a Closing Date of Jun 29, 2026, but the program is still in Active Projects.", "detail": "Confirm the transition is closed and move it to Closed Projects so ongoing counts stay accurate."}];
+
+// row = [name, category, stage, kickoff, target go-live, SOW, Checklist Progress %, notes, flag, directors[]]
+const projects = {"Gerson Jiménez": [["CIBC - MA", "ECNB", "Pre-Launch", "2026-05-14", "2026-12-21", "WIP", 36, "Waiting for client to share official schedules", "WATCH", ["Evelyn Brooks"]], ["Hinge - IN", "ECNB", "Pre-Launch", "2026-08-19", "2026-11-11", "WIP", 0, "Migrating reporting MyTime→GTT + SNOW implementation", "RED", ["Evelyn Brooks"]], ["Wayfair - ZA", "ECNB", "Pre-Launch", "2026-11-02", "2026-12-07", "WIP", 0, "New program; kick-off scheduled Nov 2, 2026", "RED", ["Satyajit Chandra"]], ["Ticketmaster - ZA", "NCNB", "Launch", "2026-06-04", "2026-09-21", "—", 9, "Internal alignment w/ Ops + client; client tooling access pending", "RED", ["Satyajit Chandra", "Emannuel Rarela"]], ["Uber - IN", "ECNB", "Launch", "2026-07-21", "2026-09-21", "WIP", 0, "Hiring 12 RTAs, 1 Sr RTA, 3 Schedulers, 1 Planner, 2 WFM TL; BP temporary support", "RED", ["Satyajit Chandra"]], ["Ping Pong - PH", "NCNB", "Training / Nesting", "2026-08-18", "2026-10-26", "WIP", 0, "Scheduler pending; production date postponed per PMO", "RED", ["Satyajit Chandra"]], ["Splashdot - US", "NCNB", "BAU Post Launch", "2026-08-17", "2026-09-08", "—", 0, "Waiting on Five9 POC fix; WFM can't see TMs — go-live date passed", "RED", ["Evelyn Brooks"]], ["Bank of Montreal (BMO) - MA", "ECNB", "BAU Post Launch", "2025-09-04", "2026-04-13", "ESL", 50, "WFM implementation guide pending", "WATCH", ["Evelyn Brooks"]], ["Doordash - PH", "ECNB", "BAU Post Launch", "2025-10-13", "2025-12-08", "SOW Signed", 82, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Satyajit Chandra"]], ["Riot Games - IN", "ECNB", "BAU Post Launch", "2025-10-16", "2025-12-16", "WIP", 91, "Closure pending, scheduled for next week", "ONTRACK", ["Aida Costello"]], ["Wayfair - MA", "ECNB", "BAU Post Launch", "2026-01-20", "2026-03-30", "WIP", 82, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Unassigned"]], ["Doordash DX & CX - PH", "ECEB", "BAU Post Launch", "2026-01-23", "2026-02-23", "WIP", 82, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Satyajit Chandra"]], ["CFA Institute - GT", "NCNB", "BAU Post Launch", "2026-03-16", "2026-06-22", "SOW Signed", 36, "Pending deliverables; will follow up and schedule closure", "WATCH", ["Evelyn Brooks"]], ["Robinhood - MA", "NCNB", "BAU Post Launch", "2026-03-23", "2026-06-01", "SOW Signed", 91, "SNOW implementation pending + ANA bot (Checklist Progress up from 82%)", "ONTRACK", ["Satyajit Chandra"]], ["Outreach - PH", "NCNB", "BAU Post Launch", "2026-04-06", "2026-08-31", "WIP", 36, "WFM implementation guide pending + Verint certification", "WATCH", ["Satyajit Chandra"]], ["Centrum - SV", "NCNB", "BAU Post Launch", "2026-04-21", "2026-06-01", "SOW Signed", 100, "Checklist Progress complete; note still says guide pending — schedule closure", "ONTRACK", ["Evelyn Brooks"]], ["WP Engine - SV", "ECNB", "BAU Post Launch", "2026-05-04", "2026-06-16", "WIP", 55, "SNOW + WFM implementation guide pending", "WATCH", ["Satyajit Chandra"]], ["Nyxoah - SV", "NCNB", "BAU Post Launch", "2026-05-12", "2026-07-27", "SOW Signed", 55, "Pending client credentials + WFM implementation guide", "WATCH", ["Evelyn Brooks"]], ["Robinhood - US", "NCNB", "BAU Post Launch", "2026-03-02", "2026-05-11", "SOW Signed", 64, "WFM implementation guide pending", "WATCH", ["Evelyn Brooks"]], ["TEMU - PH", "ECEB", "BAU Post Launch", "2025-10-15", "2025-11-24", "SOW Signed", 91, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Satyajit Chandra"]], ["Western Union - ZA", "ECNB", "BAU Post Launch", "2025-10-21", "2025-12-22", "WIP", 91, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Satyajit Chandra"]], ["Stryker - ZA", "NCNB", "BAU Post Launch", "2025-11-05", "2026-08-03", "SOW Signed", 20, "Reporting escalation; SNOW pending until the program reaches steady state", "RED", ["Satyajit Chandra"]], ["Wayfair - IN", "ECEB", "BAU Post Launch", "2025-08-06", "2025-10-13", "WIP", 91, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Satyajit Chandra"]], ["WP Engine - PH", "NCNB", "BAU Post Launch", "2026-01-12", "2026-03-09", "SOW Signed", 55, "SNOW + WFM implementation guide pending", "WATCH", ["Satyajit Chandra"]], ["TFG London - ZA", "NCNB", "BAU Post Launch", "2026-03-05", "2026-07-13", "WIP", 18, "Data accuracy issues; O/U report pending", "RED", ["Satyajit Chandra"]], ["H&R Block", "NCNB", "BAU Post Launch", "2025-08-01", "2025-11-17", "SOW Signed", 91, "SNOW pending; ANF/rollout decision with PMA & Amanda", "ONTRACK", ["Satyajit Chandra"]], ["Sparklight/Cable One - IN/SV", "NCNB", "BAU Post Launch", "2026-05-27", "2026-07-13", "WIP", 17, "Ops escalated WFM reporting issues; action registry created", "RED", ["Satyajit Chandra", "Emannuel Rarela"]]], "Elle Kumari": [["Tiktok MI Ramp", "ECEB", "Training / Nesting", "—", "—", "—", 79, "Checklist Progress 79% — WFM Support/Verint items on going", "WATCH", ["Unassigned"]], ["Kaufland Bosnia & Herzegovina", "ECNB", "Training / Nesting", "—", "—", "—", 42, "Checklist Progress 42% — Scheduling/Intraday items pending. Stage per Q2 2026 Checklist sheet (Monday shows Pre-Launch)", "WATCH", ["Unassigned"]], ["AVIS Budget Group - BG & PH", "NCNB", "BAU Post Launch", "2026-02-25", "2026-05-04", "WIP", 95, "Checklist Progress 95%", "ONTRACK", ["Aida Costello"]], ["SimpliSafe", "NCNB", "BAU Post Launch", "2026-03-25", "2026-05-25", "WIP", 99, "Checklist Progress 99%. Monday shows a Closing Date of Jun 29, 2026 — confirm and move to Closed", "ONTRACK", ["Satyajit Chandra"]], ["DCS", "NCNB", "BAU Post Launch", "2026-04-20", "2026-05-25", "SOW Signed", 95, "Checklist Progress 95%", "ONTRACK", ["Unassigned"]], ["Kaufland Romania", "ECNB", "Training / Nesting", "—", "—", "—", 86, "Checklist Progress 86%", "ONTRACK", ["Unassigned"]], ["Sport Alliance", "NCNB", "BAU Post Launch", "—", "—", "—", 96, "Checklist Progress 96%. Stage per Q2 2026 Checklist sheet (Monday shows Launch)", "ONTRACK", ["Unassigned"]], ["Cloaked, Inc.", "NCNB", "Training / Nesting", "—", "—", "—", 33, "Checklist Progress 33% — many WFM Support/Scheduling items not started. Stage per Q2 2026 Checklist sheet (Monday shows Pre-Launch)", "WATCH", ["Unassigned"]], ["Tiktok BKK, HAN, SUB", "ECEB", "Pre-Launch", "—", "—", "—", 6, "New expansion market from the Q2 2026 Checklist sheet (not yet on Monday); mostly Not Started", "RED", ["Unassigned"]], ["Sport Alliance Ramp", "NCNB", "Pre-Launch", "—", "—", "—", 3, "New ramp from the Q2 2026 Checklist sheet (not yet on Monday); mostly Not Started", "RED", ["Unassigned"]]], "Michael Vergara": [["INTUIT - SV", "NCNB", "Pre-Launch", "2026-09-04", "2026-11-09", "—", 0, "New program", "RED", ["Evelyn Brooks"]], ["Spar & Bernstein - SV", "NCNB", "Pre-Launch", "2026-09-11", "2026-10-19", "—", 0, "Waiting for kick-off", "RED", ["Evelyn Brooks"]], ["Park Power - SV", "NCNB", "Pre-Launch", "2026-09-16", "—", "—", 0, "Waiting for kick-off", "RED", ["Evelyn Brooks"]], ["FedEx - SV", "ECNB", "Training / Nesting", "—", "2026-11-09", "—", 0, "Waiting for kick-off", "RED", ["Evelyn Brooks"]], ["Centene - IN", "NCNB", "—", "—", "—", "—", 0, "Just created — no stage or dates set yet", "NA", ["Satyajit Chandra"]], ["Equals - Indo", "NCNB", "—", "—", "—", "—", 0, "Just created — no stage or dates set yet", "NA", ["Satyajit Chandra"]]]};
+
+// "reason" is read from the Monday.com "Reason" column; empty means not recorded yet
+const onHold = [{"name": "Chase Bank - GT", "cat": "NCNB", "checklist": "0%", "kickoff": "—", "target": "—", "dirs": ["Unassigned"], "reason": "", "note": "Never kicked off; no updates logged"}, {"name": "Ramble - SV", "cat": "NCNB", "checklist": "0%", "kickoff": "Nov 3, 2025", "target": "—", "dirs": ["Evelyn Brooks"], "reason": "", "note": "11 months since kickoff; no go-live date set"}, {"name": "Rockstar Games - IN", "cat": "NCNB", "checklist": "0%", "kickoff": "May 11, 2026", "target": "Jun 29, 2026 (passed)", "dirs": ["Satyajit Chandra"], "reason": "", "note": "No updates; target go-live passed 94 days ago"}, {"name": "VinFast - PH", "cat": "NCNB", "checklist": "0%", "kickoff": "Dec 17, 2025", "target": "Feb 2, 2026 (passed)", "dirs": ["Satyajit Chandra"], "reason": "", "note": "Marked On Hold; 8 months past target go-live"}];
+
+// closed from Nov 1 of last year to date
+const closedProjects = [{"name": "1-800-FLOWERS.com - SV", "cat": "NCNB", "stage": "Sunset", "golive": "2026-04-15", "closed": "2026-06-17", "basis": "PMO handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "Wise - PH", "cat": "ECNB", "stage": "Handed Over", "golive": "2025-11-17", "closed": "2026-05-12", "basis": "WFM handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "HotelPlanner - SV", "cat": "NCNB", "stage": "Handed Over", "golive": "2026-03-30", "closed": "2026-05-05", "basis": "PMO handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "Ancestry - ZA", "cat": "NCNB", "stage": "Handed Over", "golive": "2025-10-27", "closed": "2026-05-04", "basis": "WFM handover", "owner": "Gerson Jiménez", "dirs": ["Satyajit Chandra"]}, {"name": "Guesty - GT", "cat": "NCNB", "stage": "Handed Over", "golive": "2025-11-24", "closed": "2026-04-15", "basis": "WFM handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "CIBC - GT", "cat": "ECNB", "stage": "Handed Over", "golive": "2026-02-02", "closed": "2026-04-01", "basis": "WFM handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "Mercury - SV", "cat": "ECNB", "stage": "Handed Over", "golive": "2026-01-05", "closed": "2026-04-01", "basis": "WFM handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "MoneyGram - MA", "cat": "ECNB", "stage": "Handed Over", "golive": "2025-12-21", "closed": "2026-03-09", "basis": "WFM handover", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "FedEx", "cat": "ECEB", "stage": "Handed Over", "golive": "2025-11-19", "closed": "2026-03-01", "basis": "Closing date", "owner": "Elle Kumari", "dirs": ["Evelyn Brooks"]}, {"name": "United Healthcare - IN", "cat": "NCNB", "stage": "Handed Over", "golive": "2025-11-17", "closed": "2026-01-15", "basis": "PMO handover", "owner": "Gerson Jiménez", "dirs": ["Satyajit Chandra"]}, {"name": "NEXO - PH", "cat": "NCNB", "stage": "Handed Over", "golive": "2025-12-08", "closed": "2026-01-14", "basis": "PMO handover", "owner": "Gerson Jiménez", "dirs": ["Satyajit Chandra"]}, {"name": "Energie Audit Deutschland - BG", "cat": "ECNB", "stage": "Handed Over", "golive": "2026-04-16", "closed": "", "basis": "Closure date not recorded", "owner": "Elle Kumari", "dirs": ["Aida Costello"]}, {"name": "WR Group (Biovea)", "cat": "NCNB", "stage": "Handed Over", "golive": "2026-03-27", "closed": "", "basis": "Closure date not recorded", "owner": "Elle Kumari", "dirs": ["Aida Costello"]}, {"name": "Yellow Pages - SV", "cat": "NCNB", "stage": "Sunset", "golive": "2026-02-16", "closed": "", "basis": "Closure date not recorded", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "TELUS Agriculture", "cat": "NCNB", "stage": "Handed Over", "golive": "2026-03-02", "closed": "", "basis": "Closure date not recorded", "owner": "Elle Kumari", "dirs": ["Aida Costello"]}, {"name": "Custom Ink - SV", "cat": "NCNB", "stage": "Handed Over", "golive": "2026-02-23", "closed": "", "basis": "Closure date not recorded", "owner": "Gerson Jiménez", "dirs": ["Evelyn Brooks"]}, {"name": "TELUS SMB - IN", "cat": "ECNB", "stage": "Canceled", "golive": "2025-12-17", "closed": "", "basis": "Closure date not recorded", "owner": "Gerson Jiménez", "dirs": ["Carlos Garcia"]}];
+
+const MONDAY_LINKS = {"CIBC - MA": "https://telusdigital.monday.com/boards/9668126921/pulses/11993203872", "Hinge - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/12822133327", "Wayfair - ZA": "https://telusdigital.monday.com/boards/9668126921/pulses/13151030810", "Ticketmaster - ZA": "https://telusdigital.monday.com/boards/9668126921/pulses/12188658353", "Uber - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/12685554844", "Ping Pong - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/12805341292", "Splashdot - US": "https://telusdigital.monday.com/boards/9668126921/pulses/12822133767", "Bank of Montreal (BMO) - MA": "https://telusdigital.monday.com/boards/9668126921/pulses/9891107059", "Doordash - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/18175028308", "Riot Games - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/18196692204", "Wayfair - MA": "https://telusdigital.monday.com/boards/9668126921/pulses/11015626426", "Doordash DX & CX - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/11086458154", "CFA Institute - GT": "https://telusdigital.monday.com/boards/9668126921/pulses/11504069485", "Robinhood - MA": "https://telusdigital.monday.com/boards/9668126921/pulses/11592728152", "Outreach - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/11703030132", "Centrum - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/11724273749", "WP Engine - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/11724461999", "Nyxoah - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/11993165014", "Robinhood - US": "https://telusdigital.monday.com/boards/9668126921/pulses/11464750977", "TEMU - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/18196692827", "Western Union - ZA": "https://telusdigital.monday.com/boards/9668126921/pulses/18196693390", "Stryker - ZA": "https://telusdigital.monday.com/boards/9668126921/pulses/9920396299", "Wayfair - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/9957909879", "WP Engine - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/10981756564", "TFG London - ZA": "https://telusdigital.monday.com/boards/9668126921/pulses/11464356907", "H&R Block": "https://telusdigital.monday.com/boards/9668126921/pulses/9730299747", "Sparklight/Cable One - IN/SV": "https://telusdigital.monday.com/boards/9668126921/pulses/12188593148", "Tiktok MI Ramp": "https://telusdigital.monday.com/boards/9668126921/pulses/12782068806", "Kaufland Bosnia & Herzegovina": "https://telusdigital.monday.com/boards/9668126921/pulses/12782075166", "AVIS Budget Group - BG & PH": "https://telusdigital.monday.com/boards/9668126921/pulses/11419493587", "SimpliSafe": "https://telusdigital.monday.com/boards/9668126921/pulses/12010709332", "DCS": "https://telusdigital.monday.com/boards/9668126921/pulses/12010709150", "Kaufland Romania": "https://telusdigital.monday.com/boards/9668126921/pulses/12782083228", "Sport Alliance": "https://telusdigital.monday.com/boards/9668126921/pulses/12782084271", "Cloaked, Inc.": "https://telusdigital.monday.com/boards/9668126921/pulses/12941041349", "INTUIT - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/12951887486", "Spar & Bernstein - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/13018211115", "Park Power - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/13019838466", "FedEx - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/13020179740", "Centene - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/13095713587", "Equals - Indo": "https://telusdigital.monday.com/boards/9668126921/pulses/13113334326", "Chase Bank - GT": "https://telusdigital.monday.com/boards/9668126921/pulses/18196716523", "Ramble - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/9967461967", "Rockstar Games - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/11464412926", "VinFast - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/10792223517", "1-800-FLOWERS.com - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/11209280700", "Wise - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/9957848324", "HotelPlanner - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/10833428933", "Ancestry - ZA": "https://telusdigital.monday.com/boards/9668126921/pulses/9855545848", "Guesty - GT": "https://telusdigital.monday.com/boards/9668126921/pulses/9668127904", "CIBC - GT": "https://telusdigital.monday.com/boards/9668126921/pulses/18109239792", "Mercury - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/18184215838", "MoneyGram - MA": "https://telusdigital.monday.com/boards/9668126921/pulses/18077430972", "FedEx": "https://telusdigital.monday.com/boards/9668126921/pulses/18196742896", "United Healthcare - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/9690530495", "NEXO - PH": "https://telusdigital.monday.com/boards/9668126921/pulses/18184611322", "Energie Audit Deutschland - BG": "https://telusdigital.monday.com/boards/9668126921/pulses/11419486949", "WR Group (Biovea)": "https://telusdigital.monday.com/boards/9668126921/pulses/11013331527", "Yellow Pages - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/10921879375", "TELUS Agriculture": "https://telusdigital.monday.com/boards/9668126921/pulses/18389124368", "Custom Ink - SV": "https://telusdigital.monday.com/boards/9668126921/pulses/18383903728", "TELUS SMB - IN": "https://telusdigital.monday.com/boards/9668126921/pulses/18255898824"};
+function mondayLink(name){ return MONDAY_LINKS[name] || null; }
+function nameLink(name, cls){
+  const link = mondayLink(name);
+  return link ? `<a href="${link}" target="_blank" rel="noopener" class="${cls} proj-link">${name}</a>` : `<div class="${cls}">${name}</div>`;
+}
+const catTag = c => `<span title="${CAT_MEANING[c] || ''}" style="cursor:help;">${c}</span>`;
+
+function checklistColor(pct){
+  if(pct===null) return "var(--text-faint)";
+  if(pct<30) return "var(--red)";
+  if(pct<80) return "var(--amber)";
+  return "var(--green)";
+}
+function fmtDate(d){ return d === "—" || !d ? "—" : d; }
+
+// ---------- Director filter (shared by watchlist, project list, on hold, closed) ----------
+const ownerNames = Object.keys(projects);
+let currentDirector = "ALL";
+const dirMatch = dirs => currentDirector === "ALL" || dirs.includes(currentDirector);
+const dirText = dirs => dirs.join(", ");
+
+function directorList(){
+  const c = {};
+  const add = d => d.forEach(x => { c[x] = c[x] || {o:0,h:0,c:0}; });
+  ownerNames.forEach(o => projects[o].forEach(r => { add(r[9]); r[9].forEach(x => c[x].o++); }));
+  onHold.forEach(h => { add(h.dirs); h.dirs.forEach(x => c[x].h++); });
+  closedProjects.forEach(p => { add(p.dirs); p.dirs.forEach(x => c[x].c++); });
+  return Object.entries(c).sort((a,b) => (a[0]==="Unassigned") - (b[0]==="Unassigned") || (b[1].o + b[1].h) - (a[1].o + a[1].h) || a[0].localeCompare(b[0]));
+}
+function renderDirBar(){
+  const bar = document.getElementById('dirBar');
+  bar.innerHTML = '<span class="lbl">View by director</span>';
+  const mk = (label, val, n, title) => {
+    const b = document.createElement('button');
+    b.innerHTML = `${label}<span class="n">${n}</span>`;
+    if(title) b.title = title;
+    if(currentDirector === val) b.classList.add('active');
+    b.onclick = () => { currentDirector = val; renderAll(); };
+    bar.appendChild(b);
+  };
+  const total = ownerNames.reduce((a,o) => a + projects[o].length, 0);
+  mk('All directors', 'ALL', total, 'All ongoing projects');
+  directorList().forEach(([name, v]) => mk(name, name, v.o, `${v.o} ongoing, ${v.h} on hold, ${v.c} closed since Nov`));
+  const s = document.createElement('span');
+  s.className = 'scope';
+  s.textContent = 'Filters the watchlist, project list, on hold and closed sections';
+  bar.appendChild(s);
+}
+
+// ---------- Stage chart ----------
+const stageChart = document.getElementById('stageChart');
+stageData.forEach(row=>{
+  const rowEl = document.createElement('div');
+  rowEl.className = 'stage-row';
+  const segs = Object.entries(row.stages).filter(([,v])=>v>0).map(([k,v])=>{
+    const pct = (v/row.total*100).toFixed(1);
+    return `<div class="stage-seg" style="width:${pct}%;background:${STAGE_COLORS[k]}" title="${k}: ${v}">${v}</div>`;
+  }).join('');
+  rowEl.innerHTML = `<div class="owner">${row.owner}</div><div class="stage-track">${segs}</div><div class="total">${row.total}</div>`;
+  stageChart.appendChild(rowEl);
+});
+
+// ---------- Flags ----------
+const flagLog = document.getElementById('flagLog');
+redFlags.forEach(f=>{
+  const el = document.createElement('div');
+  el.className = 'flag-entry' + (f.sev==='med' ? ' sev-med' : '');
+  el.innerHTML = `<div><div class="fname">${f.name}</div><div class="ftag">${f.tag}</div></div>
+    <div class="fbody"><div class="fheadline">${f.headline}</div>${f.detail ? `<div class="fdetail">${f.detail}</div>` : ''}</div>`;
+  flagLog.appendChild(el);
+});
+
+// ---------- Watchlist ----------
+function renderWatchlist(){
+  const body = document.getElementById('watchlistBody');
+  body.innerHTML = '';
+  const rows = [];
+  ownerNames.forEach(o => projects[o].forEach(r => { if(r[6] !== null && r[6] < 10 && dirMatch(r[9])) rows.push({r, o}); }));
+  rows.sort((a,b) => a.r[6] - b.r[6] || a.r[0].localeCompare(b.r[0]));
+  rows.forEach(({r, o}) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${nameLink(r[0], 'proj-name')}</td><td class="stage-tag">${o}</td><td class="stage-tag">${dirText(r[9])}</td><td class="stage-tag">${r[2]}</td>
+      <td class="checklist-cell" style="color:${checklistColor(r[6])}">${r[6]}%</td><td class="notes-cell">${r[7]}</td>`;
+    body.appendChild(tr);
+  });
+  if(!rows.length) body.innerHTML = `<tr><td colspan="6" style="color:var(--text-faint);text-align:center;padding:24px;">No ongoing projects under 10% Checklist Progress for this director.</td></tr>`;
+}
+
+// ---------- Owner tabs + project table ----------
+const tabsEl = document.getElementById('ownerTabs');
+let currentOwner = "ALL", currentFlag = "ALL", currentSearch = "";
+const inDir = name => projects[name].filter(r => dirMatch(r[9])).length;
+
+function renderTabs(){
+  tabsEl.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.innerHTML = `All owners<span class="n">${ownerNames.reduce((a,n) => a + inDir(n), 0)}</span>`;
+  if(currentOwner==="ALL") allBtn.classList.add('active');
+  allBtn.onclick = ()=>{currentOwner="ALL"; renderTabs(); renderTable();};
+  tabsEl.appendChild(allBtn);
+  ownerNames.forEach(name=>{
+    const btn = document.createElement('button');
+    btn.innerHTML = `${name}<span class="n">${inDir(name)}</span>`;
+    if(currentOwner===name) btn.classList.add('active');
+    btn.onclick = ()=>{currentOwner=name; renderTabs(); renderTable();};
+    tabsEl.appendChild(btn);
+  });
+}
+document.querySelectorAll('[data-flagfilter]').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('[data-flagfilter]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFlag = btn.dataset.flagfilter;
+    renderTable();
+  };
+});
+document.getElementById('searchBox').addEventListener('input', (e)=>{ currentSearch = e.target.value.toLowerCase(); renderTable(); });
+
+function renderTable(){
+  const tbody = document.getElementById('projTableBody');
+  tbody.innerHTML = '';
+  const ownersToShow = currentOwner === "ALL" ? ownerNames : [currentOwner];
+  ownersToShow.forEach(owner=>{
+    projects[owner].forEach(([name, cat, stage, kickoff, target, sow, pct, notes, flag, dirs])=>{
+      if(!dirMatch(dirs)) return;
+      if(currentFlag !== "ALL" && flag !== currentFlag) return;
+      const haystack = (name + ' ' + notes + ' ' + dirText(dirs)).toLowerCase();
+      if(currentSearch && !haystack.includes(currentSearch)) return;
+      const tr = document.createElement('tr');
+      const pctLabel = pct===null ? "—" : pct + "%";
+      const fillWidth = pct===null ? 0 : pct;
+      tr.innerHTML = `
+        <td>${nameLink(name, 'proj-name')}<div style="font-size:11px;color:var(--text-faint);margin-top:2px;">${owner}</div></td>
+        <td class="cat-tag">${catTag(cat)}</td>
+        <td class="stage-tag">${stage}</td>
+        <td class="stage-tag">${dirText(dirs)}</td>
+        <td class="date-cell">${fmtDate(kickoff)}</td>
+        <td class="date-cell">${fmtDate(target)}</td>
+        <td class="sow-tag">${sow}</td>
+        <td class="checklist-cell">
+          <span class="mini-track"><span class="mini-fill" style="width:${fillWidth}%;background:${checklistColor(pct)}"></span></span>
+          <span style="color:${checklistColor(pct)}">${pctLabel}</span>
+        </td>
+        <td class="notes-cell">${notes}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+  if(tbody.innerHTML === ''){
+    tbody.innerHTML = `<tr><td colspan="9" style="color:var(--text-faint);text-align:center;padding:24px;">No projects match this filter.</td></tr>`;
+  }
+}
+
+// ---------- On hold ----------
+function renderHold(){
+  const holdGrid = document.getElementById('holdGrid');
+  holdGrid.innerHTML = '';
+  const list = onHold.filter(h => dirMatch(h.dirs));
+  list.forEach(h=>{
+    const card = document.createElement('div');
+    card.className = 'hold-card';
+    const reason = h.reason
+      ? `<div class="hreason"><span class="k">Reason on hold</span>${h.reason}</div>`
+      : `<div class="hreason missing"><span class="k">Reason on hold</span>Not recorded in Monday.com. Add it in the board's "Reason" column.</div>`;
+    card.innerHTML = `${nameLink(h.name, 'hname')}
+      <div class="hrow"><span>Category</span><span class="v">${catTag(h.cat)}</span></div>
+      <div class="hrow"><span>Checklist Progress</span><span class="v">${h.checklist}</span></div>
+      <div class="hrow"><span>Director</span><span class="v">${dirText(h.dirs)}</span></div>
+      <div class="hrow"><span>Kickoff</span><span class="v">${h.kickoff}</span></div>
+      <div class="hrow"><span>Target go-live</span><span class="v">${h.target}</span></div>
+      ${reason}
+      <div class="hnote">${h.note}</div>`;
+    holdGrid.appendChild(card);
+  });
+  if(!list.length) holdGrid.innerHTML = `<div class="hold-card" style="color:var(--text-faint);">No on-hold programs for this director.</div>`;
+}
+
+// ---------- Closed since Nov ----------
+function renderClosed(){
+  const body = document.getElementById('closedBody');
+  body.innerHTML = '';
+  const list = closedProjects.filter(p => dirMatch(p.dirs));
+  list.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${nameLink(p.name, 'proj-name')}</td><td class="cat-tag">${catTag(p.cat)}</td><td class="stage-tag">${p.stage}</td>
+      <td class="stage-tag">${p.owner}</td><td class="stage-tag">${dirText(p.dirs)}</td><td class="date-cell">${fmtDate(p.golive)}</td>
+      <td class="date-cell">${p.closed ? p.closed : '—'}</td><td class="notes-cell">${p.basis}</td>`;
+    body.appendChild(tr);
+  });
+  if(!list.length) body.innerHTML = `<tr><td colspan="8" style="color:var(--text-faint);text-align:center;padding:24px;">No closed programs for this director since Nov.</td></tr>`;
+}
+
+function renderAll(){
+  renderDirBar();
+  renderWatchlist();
+  renderTabs();
+  renderTable();
+  renderHold();
+  renderClosed();
+}
+renderAll();
+</script>
+</body>
+</html>
